@@ -2,7 +2,7 @@
   "name": "telq/sdk",
   "description": "SDK for telq REST API",
   "keywords": ["sdk"],
-  "homepage": "https://github.com/TelQ/TelQ-Telecom-SDK-PHP",
+  "homepage": "https://github.com/TelQ/sdk-php",
   "type": "library",
   "license": "MIT",
   "require": {
