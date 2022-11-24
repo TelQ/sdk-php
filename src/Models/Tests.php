@@ -141,6 +141,9 @@ class Tests implements ModelInterface
                 return $d->toArray();
             }, $this->getDestinationNetworks())
         ];
+        if ($this->getResultsCallbackUrl()) {
+            $data['resultsCallbackUrl'] = $this->getResultsCallbackUrl();
+        }
         if ($this->getMaxCallbackRetries()) {
             $data['maxCallbackRetries'] = $this->getMaxCallbackRetries();
         }
