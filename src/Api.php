@@ -6,19 +6,25 @@ use TelQ\Sdk\Http\ClientInterface;
 use TelQ\Sdk\Http\CurlClient;
 use TelQ\Sdk\Http\HttpException;
 use TelQ\Sdk\Http\Response;
+use TelQ\Sdk\Http\Url;
 use TelQ\Sdk\Models\Credentials;
+use TelQ\Sdk\Models\Lnt\LiveNumberTests;
+use TelQ\Sdk\Models\Lnt\LiveNumberTestsResponse;
+use TelQ\Sdk\Models\Lnt\LiveNumberTestsResults;
 use TelQ\Sdk\Models\ModelInterface;
 use TelQ\Sdk\Models\Network;
+use TelQ\Sdk\Models\RangeFilter;
 use TelQ\Sdk\Models\Test;
 use TelQ\Sdk\Models\TestResult;
 use TelQ\Sdk\Models\Tests;
+use TelQ\Sdk\Models\TestsResults;
 use TelQ\Sdk\Models\Token;
 use TelQ\Sdk\Token\MemoryStorage;
 use TelQ\Sdk\Token\TokenStorageInterface;
 
 class Api
 {
-    const BASE_URL = 'https://api.telqtele.com/v2.1/client';
+    const BASE_URL = 'https://api.dev.telqtele.com';
 
     private $httpClient;
 
@@ -54,19 +60,53 @@ class Api
 
         return array_map(function ($network) {
             return Network::fromArray($network);
-        }, $this->request('GET', '/networks')->getParsedBody());
+        }, $this->request('GET', '/v2.1/client/networks')->getParsedBody());
     }
 
     /**
      * @param int $id
      * @return TestResult
      */
-    public function getTestResult($id)
+    public function getManualNumberTestResult($id)
     {
         $this->requireAuth();
 
         return TestResult::fromArray(
-            $this->request('GET', '/results/' . $id)->getParsedBody()
+            $this->request('GET', '/v2.1/client/results/' . $id)->getParsedBody()
+        );
+    }
+
+    /**
+     * @param int $id
+     * @return TestResult
+     * @deprecated see getManualTestResult
+     */
+    public function getTestResult($id)
+    {
+        return $this->getManualNumberTestResult($id);
+    }
+
+    /**
+     * @param $page
+     * @param $size
+     * @param $order
+     * @param RangeFilter|null $rangeFilter
+     * @return TestsResults
+     */
+    public function getManualNumberTestsResults($page = 0, $size = 20, $order = 'asc', RangeFilter $rangeFilter = null)
+    {
+        $this->requireAuth();
+        $prams = [
+            'page' => $page,
+            'size' => $size,
+            'order' => $order
+        ];
+        if ($rangeFilter) {
+            $prams['from'] = $rangeFilter->getFrom()->format("Y-m-d\Th:m:s\.00\Z");
+            $prams['to'] = $rangeFilter->getFrom()->format("Y-m-d\Th:m:s\.00\Z");
+        }
+        return TestsResults::fromArray(
+            $this->request('GET', Url::create('/v2.1/client/tests', $prams))->getParsedBody()
         );
     }
 
@@ -74,13 +114,58 @@ class Api
      * @param Tests $tests
      * @return Test[]
      */
-    public function sendTests(Tests $tests)
+    public function sendManualNumberTests(Tests $tests)
     {
         $this->requireAuth();
 
         return array_map(function ($test) {
             return Test::fromArray($test);
-        }, $this->request('POST', '/tests', $tests)->getParsedBody());
+        }, $this->request('POST', '/v2.2/client/tests', $tests)->getParsedBody());
+    }
+
+    /**
+     * @param Tests $tests
+     * @return Test[]
+     * @deprecated see sendManualTests
+     */
+    public function sendTests(Tests $tests)
+    {
+        return $this->sendManualNumberTests($tests);
+    }
+
+    /**
+     * @param LiveNumberTests $tests
+     * @return LiveNumberTestsResponse
+     */
+    public function sendLiveNumberTests(LiveNumberTests $tests)
+    {
+        $this->requireAuth();
+
+        return LiveNumberTestsResponse::fromArray($this->request('POST', '/v2.2/client/lnt/tests', $tests)->getParsedBody());
+    }
+
+    /**
+     * @param $page
+     * @param $size
+     * @param $order
+     * @param RangeFilter|null $rangeFilter
+     * @return LiveNumberTestsResults
+     */
+    public function getLiveNumberTestsResults($page = 0, $size = 20, $order = 'asc', RangeFilter $rangeFilter = null)
+    {
+        $this->requireAuth();
+        $prams = [
+            'page' => $page,
+            'size' => $size,
+            'order' => $order
+        ];
+        if ($rangeFilter) {
+            $prams['from'] = $rangeFilter->getFrom()->format("Y-m-d\Th:m:s\.00\Z");
+            $prams['to'] = $rangeFilter->getFrom()->format("Y-m-d\Th:m:s\.00\Z");
+        }
+        return LiveNumberTestsResults::fromArray(
+            $this->request('GET', Url::create('/v2.2/client/lnt/tests', $prams))->getParsedBody()
+        );
     }
 
     private function requireAuth()
@@ -93,7 +178,7 @@ class Api
             return;
         }
 
-        $data = $this->request('POST', '/token', $this->credentials)->getParsedBody();
+        $data = $this->request('POST', '/v2.2/client/token', $this->credentials)->getParsedBody();
         $this->token = new Token($data['ttl'], $data['value']);
         $this->tokenStorage->set($this->token);
     }
@@ -109,7 +194,7 @@ class Api
         $url = self::BASE_URL . '/' . ltrim($url, '/');
         $headers = [
             'accept' => 'application/json',
-            'user-agent' => 'php-sdk-1.0.0'
+            'user-agent' => 'php-sdk-1.2.0'
         ];
 
         if ($this->token and $this->token->getValue()) {
@@ -121,7 +206,6 @@ class Api
             $bodyStr = json_encode($body->toArray());
             $headers['Content-Type'] = 'application/json';
         }
-
         $response = $this->httpClient->request($method, $url, $headers, $bodyStr);
 
         if (!$response->isSuccess()) {

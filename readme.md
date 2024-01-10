@@ -37,7 +37,8 @@ foreach ($networks as $network) {
 }
 echo 'Networks: ', count($networks), PHP_EOL;
 ```
-## Send tests
+## Manual testing
+### Create tests
 ```php
 use TelQ\Sdk\Models\Destination;
 use TelQ\Sdk\Models\Tests;
@@ -77,7 +78,7 @@ $sendTests = Tests::fromArray([
     'testTimeToLiveInSeconds' => 3600
 ]);
 ```
-## Get test result
+### Get test result
 ```php
 $result = $api->getTestResult(13777294);
 echo 'Id: ', $result->getId(), PHP_EOL;
@@ -111,6 +112,75 @@ if ($result->getSmscInfo()) {
     echo '    empty', PHP_EOL;
 }
 echo 'Pdu delivered: ', $result->getPdusDelivered() ? implode(', ', $result->getPdusDelivered()) : 'empty', PHP_EOL;
+```
+
+## Live number testing
+### Create tests
+```php
+use TelQ\Sdk\Models\Lnt\LiveNumberTest;
+use TelQ\Sdk\Models\Lnt\LiveNumberTests;
+use TelQ\Sdk\Models\UdhTlv;
+
+$sendTests = LiveNumberTests::fromArray([
+    'tests' => [
+        LiveNumberTest::fromArray([
+            'sender' => 'Google',
+            'text' => 'message',
+            'supplierId' => 946,
+            'mcc' => '262',
+            'mnc' => '14'
+        ])
+    ]
+]);
+$response = $api->sendLiveNumberTests($sendTests);
+foreach ($response->getTests() as $test) {
+    echo 'Id: ', $test->getId(), PHP_EOL;
+    echo 'PhoneNumber: ', $test->getPhoneNumber(), PHP_EOL;
+    echo 'TestIdText: ', $test->getTestIdText(), PHP_EOL;
+    echo 'Error message: ', $test->getErrorMessage() ?: 'empty', PHP_EOL;
+    echo 'Destination:', PHP_EOL;
+    echo '    Mcc: ', $test->getDestinationNetwork()->getMcc(), PHP_EOL;
+    echo '    Mnc: ', $test->getDestinationNetwork()->getMnc(), PHP_EOL;
+    echo '    Ported from mnc: ', $test->getDestinationNetwork()->getPortedFromMnc() ?: 'empty', PHP_EOL;
+    echo PHP_EOL;
+}
+echo 'Error: ', $response->getError(), PHP_EOL;
+
+// advanced example
+// docs https://api-doc.telqtele.com/#request-details
+$sendTests = LiveNumberTests::fromArray([
+    'tests' => [
+        LiveNumberTest::fromArray([
+            'sender' => 'Google',
+            'text' => 'message',
+            'testIdTextType' => 'ALPHA',
+            'testIdTextCase' => 'LOWER',
+            'testIdTextLength' => 7,
+            'supplierId' => 946,
+            'mcc' => '262',
+            'mnc' => '14',
+            'portedFromMnc' => '01'
+        ])
+    ],
+    'resultsCallbackUrl' => 'https://some-callback-url.com/some-path',
+    'maxCallbackRetries' => 1,
+    'dataCoding' => '01',  // 00, 01, 03, 08, F0
+    'sourceTon' => '01', // 00, 01, 02, 03, 04, 05, 06
+    'sourceNpi' => '12', // 00, 01, 03, 04, 06, 08, 09, 0A, 0E, 12
+    'testTimeToLiveInSeconds' => 600,
+    'smppValidityPeriod' => 120,
+    'scheduledDeliveryTime' => new DateTime(),
+    'replaceIfPresentFlag' => 0,
+    'priorityFlag' => 1,
+    'sendTextAsMessagePayloadTlv' => 0,
+    'commentText' => 'Optional comment',
+    'tlv' => [
+        new UdhTlv('1B1A', '1AAF')
+    ],  
+    'udh' => [
+        new UdhTlv('1F', '11BB')
+    ], 
+]);
 ```
 
 # Configuration

@@ -7,6 +7,8 @@ use TelQ\Sdk\Api;
 use TelQ\Sdk\Http\Response;
 use TelQ\Sdk\Http\TestClient;
 use TelQ\Sdk\Models\Destination;
+use TelQ\Sdk\Models\Lnt\LiveNumberTest;
+use TelQ\Sdk\Models\Lnt\LiveNumberTests;
 use TelQ\Sdk\Models\Network;
 use TelQ\Sdk\Models\SmscInfo;
 use TelQ\Sdk\Models\Tests;
@@ -130,6 +132,48 @@ class ApiTest extends TestCase
         $this->assertEquals(SmscInfo::fromArray($result['smscInfo']), $resultResponse->getSmscInfo());
         $this->assertEquals($result['pdusDelivered'][0], $resultResponse->getPdusDelivered()[0]);
 
+    }
+
+    public function testLiveNumberTestSend()
+    {
+        $tests = [
+            'tests' => [
+                [
+                    'id' => 19119748,
+                    'phoneNumber' => '33611223344',
+                    'testIdText' => 'zlrtyrvdl',
+                    'errorMessage' => null,
+                    'destinationNetwork' => [
+                        'mcc' => '208',
+                        'mnc' => '10',
+                        'portedFromMnc' => null
+                    ],
+                    "testIdTextType" => "NUMERIC",
+                    "testIdTextCase" => null,
+                    "testIdTextLength" => 7,
+                ]
+            ],
+            'error' => null
+        ];
+        $httpClient = new TestClient([
+            $this->createResponse(200, ['ttl' => 3600, 'value' => '']),
+            $this->createResponse(200, $tests)
+        ]);
+        $api = new Api(123, 'key', $httpClient);
+        $response = $api->sendLiveNumberTests(LiveNumberTests::fromArray([
+            'tests' => [LiveNumberTest::fromArray([
+                'sender' => 'Google',
+                'text' => 'message',
+                'supplierId' => 946,
+                'mcc' => '208',
+                'mnc' => '10'
+            ])]
+        ]));
+        $responseTests = $response->getTests();
+        $this->assertEquals($tests['tests'][0]['id'], $responseTests[0]->getId());
+        $this->assertEquals($tests['tests'][0]['phoneNumber'], $responseTests[0]->getPhoneNumber());
+        $this->assertEquals($tests['tests'][0]['testIdText'], $responseTests[0]->getTestIdText());
+        $this->assertNull($response->getError());
     }
 
     /**

@@ -227,8 +227,9 @@ class TestResult
         if (isset($data['smscInfo']) and $data['smscInfo']) {
             $model->setSmscInfo(SmscInfo::fromArray($data['smscInfo']));
         }
-
-        $model->setPdusDelivered($data['pdusDelivered']);
+        if ($data['pdusDelivered']) {
+            $model->setPdusDelivered($data['pdusDelivered']);
+        }
 
         return $model;
     }
