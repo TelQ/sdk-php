@@ -15,7 +15,9 @@ class RangeFilter
      */
     public function __construct(\DateTime $from, \DateTime $to)
     {
+        $from->setTimezone(new \DateTimeZone('UTC'));
         $this->from = $from;
+        $to->setTimezone(new \DateTimeZone('UTC'));
         $this->to = $to;
     }
 

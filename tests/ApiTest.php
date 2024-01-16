@@ -93,7 +93,7 @@ class ApiTest extends TestCase
             'testCreatedAt' =>'2020-02-13T17:01:54.352886Z',
             'smsReceivedAt' =>'2020-02-13T17:05:27Z',
             'receiptDelay' => 213,
-            'testStatus' =>'POSITIVE',
+            'receiptStatus' =>'POSITIVE',
             'destinationNetworkDetails' => [
                 'mcc' => '206',
                 'mnc' => '10',
@@ -127,7 +127,7 @@ class ApiTest extends TestCase
         $this->assertEquals(new \DateTime($result['testCreatedAt']), $resultResponse->getTestCreatedAt());
         $this->assertEquals(new \DateTime($result['smsReceivedAt']), $resultResponse->getSmsReceivedAt());
         $this->assertEquals($result['receiptDelay'], $resultResponse->getReceiptDelay());
-        $this->assertEquals($result['testStatus'], $resultResponse->getTestStatus());
+        $this->assertEquals($result['receiptStatus'], $resultResponse->getTestStatus());
         $this->assertEquals(Network::fromArray($result['destinationNetworkDetails']), $resultResponse->getDestinationNetworkDetails());
         $this->assertEquals(SmscInfo::fromArray($result['smscInfo']), $resultResponse->getSmscInfo());
         $this->assertEquals($result['pdusDelivered'][0], $resultResponse->getPdusDelivered()[0]);

@@ -67,7 +67,7 @@ class Api
      * @param int $id
      * @return TestResult
      */
-    public function getManualNumberTestResult($id)
+    public function getManualTestResult($id)
     {
         $this->requireAuth();
 
@@ -83,7 +83,7 @@ class Api
      */
     public function getTestResult($id)
     {
-        return $this->getManualNumberTestResult($id);
+        return $this->getManualTestResult($id);
     }
 
     /**
@@ -93,20 +93,20 @@ class Api
      * @param RangeFilter|null $rangeFilter
      * @return TestsResults
      */
-    public function getManualNumberTestsResults($page = 0, $size = 20, $order = 'asc', RangeFilter $rangeFilter = null)
+    public function getManualTestsResults($page = 0, $size = 20, $order = 'asc', RangeFilter $rangeFilter = null)
     {
         $this->requireAuth();
-        $prams = [
+        $params = [
             'page' => $page,
             'size' => $size,
             'order' => $order
         ];
         if ($rangeFilter) {
-            $prams['from'] = $rangeFilter->getFrom()->format("Y-m-d\Th:m:s\.00\Z");
-            $prams['to'] = $rangeFilter->getFrom()->format("Y-m-d\Th:m:s\.00\Z");
+            $params['from'] = $rangeFilter->getFrom()->format("Y-m-d\TH:i:s\.00\Z");
+            $params['to'] = $rangeFilter->getTo()->format("Y-m-d\TH:i:s\.00\Z");
         }
         return TestsResults::fromArray(
-            $this->request('GET', Url::create('/v2.1/client/tests', $prams))->getParsedBody()
+            $this->request('GET', Url::create('/v2.2/client/tests', $params))->getParsedBody()
         );
     }
 
@@ -114,7 +114,7 @@ class Api
      * @param Tests $tests
      * @return Test[]
      */
-    public function sendManualNumberTests(Tests $tests)
+    public function sendManualTests(Tests $tests)
     {
         $this->requireAuth();
 
@@ -130,7 +130,7 @@ class Api
      */
     public function sendTests(Tests $tests)
     {
-        return $this->sendManualNumberTests($tests);
+        return $this->sendManualTests($tests);
     }
 
     /**
@@ -154,17 +154,17 @@ class Api
     public function getLiveNumberTestsResults($page = 0, $size = 20, $order = 'asc', RangeFilter $rangeFilter = null)
     {
         $this->requireAuth();
-        $prams = [
+        $params = [
             'page' => $page,
             'size' => $size,
             'order' => $order
         ];
         if ($rangeFilter) {
-            $prams['from'] = $rangeFilter->getFrom()->format("Y-m-d\Th:m:s\.00\Z");
-            $prams['to'] = $rangeFilter->getFrom()->format("Y-m-d\Th:m:s\.00\Z");
+            $params['from'] = $rangeFilter->getFrom()->format("Y-m-d\TH:i:s\.00\Z");
+            $params['to'] = $rangeFilter->getTo()->format("Y-m-d\TH:i:s\.00\Z");
         }
         return LiveNumberTestsResults::fromArray(
-            $this->request('GET', Url::create('/v2.2/client/lnt/tests', $prams))->getParsedBody()
+            $this->request('GET', Url::create('/v2.2/client/lnt/tests', $params))->getParsedBody()
         );
     }
 
