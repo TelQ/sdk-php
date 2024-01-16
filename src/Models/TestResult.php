@@ -220,15 +220,20 @@ class TestResult
             $model->setSmsReceivedAt(new \DateTime($data['smsReceivedAt']));
         }
         $model->setReceiptDelay($data['receiptDelay']);
-        $model->setTestStatus($data['testStatus']);
+        if (isset($data['testStatus'])) {
+            $model->setTestStatus($data['testStatus']);
+        } elseif (isset($data['receiptStatus'])) {
+            $model->setTestStatus($data['receiptStatus']);
+        }
         if (isset($data['destinationNetworkDetails']) and $data['destinationNetworkDetails']) {
             $model->setDestinationNetworkDetails(Network::fromArray($data['destinationNetworkDetails']));
         }
         if (isset($data['smscInfo']) and $data['smscInfo']) {
             $model->setSmscInfo(SmscInfo::fromArray($data['smscInfo']));
         }
-
-        $model->setPdusDelivered($data['pdusDelivered']);
+        if ($data['pdusDelivered']) {
+            $model->setPdusDelivered($data['pdusDelivered']);
+        }
 
         return $model;
     }

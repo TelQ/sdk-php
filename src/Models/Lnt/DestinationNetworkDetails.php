@@ -1,26 +1,26 @@
 <?php
 
-namespace TelQ\Sdk\Models;
+namespace TelQ\Sdk\Models\Lnt;
 
-class Network
+class DestinationNetworkDetails
 {
-    /** @var string */
+    /** @var string|null */
     private $mcc;
-    /** @var string */
-    private $countryName;
-    /** @var string */
+    /** @var string|null */
     private $mnc;
-    /** @var string */
-    private $providerName;
     /** @var string|null */
     private $portedFromMnc;
+    /** @var string|null */
+    private $countryName;
+    /** @var string|null */
+    private $providerName;
     /** @var string|null */
     private $portedFromProviderName;
     /** @var string|null */
     private $phoneNumber;
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getMcc()
     {
@@ -28,7 +28,7 @@ class Network
     }
 
     /**
-     * @param string $mcc
+     * @param string|null $mcc
      */
     public function setMcc($mcc)
     {
@@ -36,23 +36,7 @@ class Network
     }
 
     /**
-     * @return string
-     */
-    public function getCountryName()
-    {
-        return $this->countryName;
-    }
-
-    /**
-     * @param string $countryName
-     */
-    public function setCountryName($countryName)
-    {
-        $this->countryName = $countryName;
-    }
-
-    /**
-     * @return string
+     * @return string|null
      */
     public function getMnc()
     {
@@ -60,27 +44,11 @@ class Network
     }
 
     /**
-     * @param string $mnc
+     * @param string|null $mnc
      */
     public function setMnc($mnc)
     {
         $this->mnc = $mnc;
-    }
-
-    /**
-     * @return string
-     */
-    public function getProviderName()
-    {
-        return $this->providerName;
-    }
-
-    /**
-     * @param string $providerName
-     */
-    public function setProviderName($providerName)
-    {
-        $this->providerName = $providerName;
     }
 
     /**
@@ -92,11 +60,43 @@ class Network
     }
 
     /**
-     * @param string $portedFromMnc
+     * @param string|null $portedFromMnc
      */
     public function setPortedFromMnc($portedFromMnc)
     {
         $this->portedFromMnc = $portedFromMnc;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getCountryName()
+    {
+        return $this->countryName;
+    }
+
+    /**
+     * @param string|null $countryName
+     */
+    public function setCountryName($countryName)
+    {
+        $this->countryName = $countryName;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getProviderName()
+    {
+        return $this->providerName;
+    }
+
+    /**
+     * @param string|null $providerName
+     */
+    public function setProviderName($providerName)
+    {
+        $this->providerName = $providerName;
     }
 
     /**
@@ -108,7 +108,7 @@ class Network
     }
 
     /**
-     * @param string $portedFromProviderName
+     * @param string|null $portedFromProviderName
      */
     public function setPortedFromProviderName($portedFromProviderName)
     {
@@ -133,15 +133,23 @@ class Network
 
     /**
      * @param array $data
-     * @return static
+     * @return self
      */
     public static function fromArray(array $data)
     {
         $model = new self();
-        $model->setMcc($data['mcc']);
-        $model->setCountryName($data['countryName']);
-        $model->setMnc($data['mnc']);
-        $model->setProviderName($data['providerName']);
+        if (isset($data['mcc'])) {
+            $model->setMcc($data['mcc']);
+        }
+        if (isset($data['countryName'])) {
+            $model->setCountryName($data['countryName']);
+        }
+        if (isset($data['mnc'])) {
+            $model->setMnc($data['mnc']);
+        }
+        if (isset($data['providerName'])) {
+            $model->setProviderName($data['providerName']);
+        }
         if (isset($data['portedFromMnc'])) {
             $model->setPortedFromMnc($data['portedFromMnc']);
         }
@@ -151,6 +159,7 @@ class Network
         if (isset($data['phoneNumber'])) {
             $model->setPhoneNumber($data['phoneNumber']);
         }
+
         return $model;
     }
 }
