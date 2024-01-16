@@ -106,7 +106,7 @@ class Api
             $params['to'] = $rangeFilter->getTo()->format("Y-m-d\TH:i:s\.00\Z");
         }
         return TestsResults::fromArray(
-            $this->request('GET', Url::create('/v2.2/client/tests', $params))->getParsedBody()
+            $this->request('GET', Url::create('/v2.1/client/tests', $params))->getParsedBody()
         );
     }
 
