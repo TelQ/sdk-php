@@ -113,6 +113,34 @@ if ($result->getSmscInfo()) {
 }
 echo 'Pdu delivered: ', $result->getPdusDelivered() ? implode(', ', $result->getPdusDelivered()) : 'empty', PHP_EOL;
 ```
+### Search tests results
+```php
+// last 20 results
+$results = $api->getManualTestsResults(0, 20, 'desc');
+echo 'Page: ', $results->getPage(), PHP_EOL;
+echo 'Size: ', $results->getSize(), PHP_EOL;
+echo 'Order: ', $results->getOrder(), PHP_EOL;
+echo 'Error: ', $results->getError() ?: 'empty', PHP_EOL;
+foreach ($results->getContent() as $result) {
+    echo 'Id: ', $result->getId(), PHP_EOL;
+    echo 'TestIdText: ', $result->getTestIdText(), PHP_EOL;
+}
+
+// today tests
+$range = new RangeFilter(
+    new DateTime('today 00:00:00'),
+    new DateTime('today 23:59:59')
+);
+$results = $api->getManualTestsResults(0, 20, 'desc', $range);
+echo 'Page: ', $results->getPage(), PHP_EOL;
+echo 'Size: ', $results->getSize(), PHP_EOL;
+echo 'Order: ', $results->getOrder(), PHP_EOL;
+echo 'Error: ', $results->getError() ?: 'empty', PHP_EOL;
+foreach ($results->getContent() as $result) {
+    echo 'Id: ', $result->getId(), PHP_EOL;
+    echo 'TestIdText: ', $result->getTestIdText(), PHP_EOL;
+}
+```
 
 ## Live number testing
 ### Create tests
@@ -147,7 +175,6 @@ foreach ($response->getTests() as $test) {
 echo 'Error: ', $response->getError(), PHP_EOL;
 
 // advanced example
-// docs https://api-doc.telqtele.com/#request-details
 $sendTests = LiveNumberTests::fromArray([
     'tests' => [
         LiveNumberTest::fromArray([
@@ -182,7 +209,38 @@ $sendTests = LiveNumberTests::fromArray([
     ], 
 ]);
 ```
+### Search tests results
+```php
+// last 20 results
+$results = $api->getLiveNumberTestsResults(0, 20, 'desc');
+echo 'Page: ', $results->getPage(), PHP_EOL;
+echo 'Size: ', $results->getSize(), PHP_EOL;
+echo 'Order: ', $results->getOrder(), PHP_EOL;
+echo 'Error: ', $results->getError() ?: 'empty', PHP_EOL;
+foreach ($results->getContent() as $result) {
+    echo 'Id: ', $result->getId(), PHP_EOL;
+    echo 'TestIdText: ', $result->getTestIdText(), PHP_EOL;
+    echo 'DLR status: ', $result->getDlrStatus(), PHP_EOL;
+    echo 'Receipt status: ', $result->getReceiptStatus(), PHP_EOL;
+}
 
+// today tests
+$range = new RangeFilter(
+    new DateTime('today 00:00:00'),
+    new DateTime('today 23:59:59')
+);
+$results = $api->getLiveNumberTestsResults(0, 20, 'desc', $range);
+echo 'Page: ', $results->getPage(), PHP_EOL;
+echo 'Size: ', $results->getSize(), PHP_EOL;
+echo 'Order: ', $results->getOrder(), PHP_EOL;
+echo 'Error: ', $results->getError() ?: 'empty', PHP_EOL;
+foreach ($results->getContent() as $result) {
+    echo 'Id: ', $result->getId(), PHP_EOL;
+    echo 'TestIdText: ', $result->getTestIdText(), PHP_EOL;
+    echo 'DLR status: ', $result->getDlrStatus(), PHP_EOL;
+    echo 'Receipt status: ', $result->getReceiptStatus(), PHP_EOL, PHP_EOL;
+}
+```
 # Configuration
 ## Http client
 ```php
