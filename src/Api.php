@@ -24,7 +24,7 @@ use TelQ\Sdk\Token\TokenStorageInterface;
 
 class Api
 {
-    const BASE_URL = 'https://api.dev.telqtele.com';
+    const BASE_URL = 'https://api.telqtele.com';
 
     private $httpClient;
 
