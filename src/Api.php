@@ -60,7 +60,7 @@ class Api
 
         return array_map(function ($network) {
             return Network::fromArray($network);
-        }, $this->request('GET', '/v2.1/client/networks')->getParsedBody());
+        }, $this->request('GET', '/v3/client/networks')->getParsedBody());
     }
 
     /**
@@ -72,18 +72,8 @@ class Api
         $this->requireAuth();
 
         return TestResult::fromArray(
-            $this->request('GET', '/v2.1/client/results/' . $id)->getParsedBody()
+            $this->request('GET', '/v3/client/tests/' . $id)->getParsedBody()
         );
-    }
-
-    /**
-     * @param int $id
-     * @return TestResult
-     * @deprecated see getManualTestResult
-     */
-    public function getTestResult($id)
-    {
-        return $this->getManualTestResult($id);
     }
 
     /**
@@ -106,7 +96,7 @@ class Api
             $params['to'] = $rangeFilter->getTo()->format("Y-m-d\TH:i:s\.00\Z");
         }
         return TestsResults::fromArray(
-            $this->request('GET', Url::create('/v2.1/client/tests', $params))->getParsedBody()
+            $this->request('GET', Url::create('/v3/client/tests', $params))->getParsedBody()
         );
     }
 
@@ -120,17 +110,7 @@ class Api
 
         return array_map(function ($test) {
             return Test::fromArray($test);
-        }, $this->request('POST', '/v2.2/client/tests', $tests)->getParsedBody());
-    }
-
-    /**
-     * @param Tests $tests
-     * @return Test[]
-     * @deprecated see sendManualTests
-     */
-    public function sendTests(Tests $tests)
-    {
-        return $this->sendManualTests($tests);
+        }, $this->request('POST', '/v3/client/tests', $tests)->getParsedBody());
     }
 
     /**
@@ -141,7 +121,7 @@ class Api
     {
         $this->requireAuth();
 
-        return LiveNumberTestsResponse::fromArray($this->request('POST', '/v2.2/client/lnt/tests', $tests)->getParsedBody());
+        return LiveNumberTestsResponse::fromArray($this->request('POST', '/v3/client/lnt/tests', $tests)->getParsedBody());
     }
 
     /**
@@ -164,7 +144,7 @@ class Api
             $params['to'] = $rangeFilter->getTo()->format("Y-m-d\TH:i:s\.00\Z");
         }
         return LiveNumberTestsResults::fromArray(
-            $this->request('GET', Url::create('/v2.2/client/lnt/tests', $params))->getParsedBody()
+            $this->request('GET', Url::create('/v3/client/lnt/tests', $params))->getParsedBody()
         );
     }
 
@@ -178,7 +158,7 @@ class Api
             return;
         }
 
-        $data = $this->request('POST', '/v2.2/client/token', $this->credentials)->getParsedBody();
+        $data = $this->request('POST', '/v3/client/token', $this->credentials)->getParsedBody();
         $this->token = new Token($data['ttl'], $data['value']);
         $this->tokenStorage->set($this->token);
     }
@@ -194,7 +174,7 @@ class Api
         $url = self::BASE_URL . '/' . ltrim($url, '/');
         $headers = [
             'accept' => 'application/json',
-            'user-agent' => 'php-sdk-1.2.0'
+            'user-agent' => 'php-sdk-2.0.0'
         ];
 
         if ($this->token and $this->token->getValue()) {
@@ -206,6 +186,7 @@ class Api
             $bodyStr = json_encode($body->toArray());
             $headers['Content-Type'] = 'application/json';
         }
+
         $response = $this->httpClient->request($method, $url, $headers, $bodyStr);
 
         if (!$response->isSuccess()) {

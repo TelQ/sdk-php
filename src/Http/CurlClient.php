@@ -63,7 +63,15 @@ class CurlClient implements ClientInterface
         });
 
         $body = curl_exec($ch);
+
+        if (($curlError = curl_errno($ch))) {
+            $curlErrorText = curl_error($ch);
+            curl_close($ch);
+            throw new ClientException('CURL error ' . $curlError . ': ' . $curlErrorText);
+        }
+
         $status = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
 
         return new Response($status, $headersResponse, $body ? (string) $body : '');
     }
