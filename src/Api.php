@@ -14,6 +14,16 @@ use TelQ\Sdk\Models\Lnt\LiveNumberTestsResults;
 use TelQ\Sdk\Models\ModelInterface;
 use TelQ\Sdk\Models\Network;
 use TelQ\Sdk\Models\RangeFilter;
+use TelQ\Sdk\Models\Smpp\AssignSuppliers;
+use TelQ\Sdk\Models\Smpp\CreateUpdateSession;
+use TelQ\Sdk\Models\Smpp\CreateUpdateSessionResponse;
+use TelQ\Sdk\Models\Smpp\CreateUpdateSupplier;
+use TelQ\Sdk\Models\Smpp\CreateUpdateSupplierResponse;
+use TelQ\Sdk\Models\Smpp\SearchSession;
+use TelQ\Sdk\Models\Smpp\SearchSessionPage;
+use TelQ\Sdk\Models\Smpp\SearchSupplier;
+use TelQ\Sdk\Models\Smpp\SearchSupplierPage;
+use TelQ\Sdk\Models\Smpp\SessionSupplierPage;
 use TelQ\Sdk\Models\Test;
 use TelQ\Sdk\Models\TestResult;
 use TelQ\Sdk\Models\Tests;
@@ -24,7 +34,7 @@ use TelQ\Sdk\Token\TokenStorageInterface;
 
 class Api
 {
-    const BASE_URL = 'https://api.telqtele.com';
+    const BASE_URL = 'https://api.dev.telqtele.com';
 
     private $httpClient;
 
@@ -145,6 +155,171 @@ class Api
         }
         return LiveNumberTestsResults::fromArray(
             $this->request('GET', Url::create('/v3/client/lnt/tests', $params))->getParsedBody()
+        );
+    }
+
+    /**
+     * @param CreateUpdateSession $session
+     * @return CreateUpdateSessionResponse
+     */
+    public function createSession(CreateUpdateSession $session)
+    {
+        $this->requireAuth();
+        return CreateUpdateSessionResponse::fromArray(
+            $this->request('POST', Url::create('/v3/client/sessions'), $session)->getParsedBody()
+        );
+    }
+
+    /**
+     * @param CreateUpdateSession $session
+     * @return void
+     */
+    public function updateSession(CreateUpdateSession $session)
+    {
+        $this->requireAuth();
+        $this->request('PUT', Url::create('/v3/client/sessions'), $session);
+    }
+
+    /**
+     * @param int $id
+     * @return SearchSession
+     */
+    public function getSession(int $id)
+    {
+        $this->requireAuth();
+        return SearchSession::fromArray(
+            $this->request('GET', Url::create('/v3/client/sessions/' . $id))->getParsedBody()
+        );
+    }
+
+    /**
+     * @param $page
+     * @param $size
+     * @param $order
+     * @return SearchSessionPage
+     */
+    public function getSessions($page = 0, $size = 20, $order = 'asc')
+    {
+        $this->requireAuth();
+        $params = [
+            'page' => $page,
+            'size' => $size,
+            'sort' => 'id,' . $order
+        ];
+        return SearchSessionPage::fromArray(
+            $this->request('GET', Url::create('/v3/client/sessions', $params))->getParsedBody()
+        );
+    }
+
+    /**
+     * @param int $id
+     * @return void
+     */
+    public function deleteSession(int $id)
+    {
+        $this->requireAuth();
+        $this->request('DELETE', Url::create('/v3/client/sessions/' . $id));
+    }
+
+    /**
+     * @param CreateUpdateSupplier $supplier
+     * @return CreateUpdateSupplierResponse
+     */
+    public function createSupplier(CreateUpdateSupplier $supplier)
+    {
+        $this->requireAuth();
+        return CreateUpdateSupplierResponse::fromArray(
+            $this->request('POST', Url::create('/v3/client/suppliers'), $supplier)->getParsedBody()
+        );
+    }
+
+    /**
+     * @param CreateUpdateSupplier $supplier
+     * @return void
+     */
+    public function updateSupplier(CreateUpdateSupplier $supplier)
+    {
+        $this->requireAuth();
+        $this->request('PUT', Url::create('/v3/client/suppliers'), $supplier);
+    }
+
+    /**
+     * @param int $id
+     * @return void
+     */
+    public function deleteSupplier(int $id)
+    {
+        $this->requireAuth();
+        $this->request('DELETE', Url::create('/v3/client/suppliers/' . $id));
+    }
+
+    /**
+     * @param int $id
+     * @return SearchSupplier
+     */
+    public function getSupplier(int $id)
+    {
+        $this->requireAuth();
+        return SearchSupplier::fromArray(
+            $this->request('GET', Url::create('/v3/client/suppliers/' . $id))->getParsedBody()
+        );
+    }
+
+    /**
+     * @param $page
+     * @param $size
+     * @param $order
+     * @return SearchSupplierPage
+     */
+    public function getSuppliers($page = 0, $size = 20, $order = 'asc')
+    {
+        $this->requireAuth();
+        $params = [
+            'page' => $page,
+            'size' => $size,
+            'sort' => 'id,' . $order
+        ];
+        return SearchSupplierPage::fromArray(
+            $this->request('GET', Url::create('/v3/client/suppliers', $params))->getParsedBody()
+        );
+    }
+
+    /**
+     * @param int $sessionId sessionId
+     * @return SearchSupplier[]
+     */
+    public function getSuppliersBySessionId(int $sessionId)
+    {
+        $this->requireAuth();
+        return array_map(
+            [SearchSupplier::class, 'fromArray'],
+            $this->request('GET', Url::create('/v3/client/sessions/' . $sessionId . '/suppliers'))->getParsedBody()
+        );
+    }
+
+    public function assignSuppliersToSession(array $supplierIds, $sessionId)
+    {
+        $this->requireAuth();
+        $body = new AssignSuppliers($supplierIds, $sessionId);
+        $this->request('POST', Url::create('/v3/client/suppliers/assign'), $body);
+    }
+
+    /**
+     * @param $page
+     * @param $size
+     * @param $order
+     * @return SessionSupplierPage
+     */
+    public function getSessionsSuppliers($page = 0, $size = 20, $order = 'asc')
+    {
+        $this->requireAuth();
+        $params = [
+            'page' => $page,
+            'size' => $size,
+            'sort' => 'id,' . $order
+        ];
+        return SessionSupplierPage::fromArray(
+            $this->request('GET', Url::create('/v3/client/sessions-suppliers', $params))->getParsedBody()
         );
     }
 
