@@ -35,6 +35,10 @@ use TelQ\Sdk\Token\TokenStorageInterface;
 class Api
 {
     const BASE_URL = 'https://api.dev.telqtele.com';
+    
+    const SORT_ASC = 'asc';
+    
+    const SORD_DESC = 'desc';
 
     private $httpClient;
 
@@ -89,17 +93,17 @@ class Api
     /**
      * @param $page
      * @param $size
-     * @param $order
+     * @param $sort
      * @param RangeFilter|null $rangeFilter
      * @return TestsResults
      */
-    public function getManualTestsResults($page = 0, $size = 20, $order = 'asc', RangeFilter $rangeFilter = null)
+    public function getManualTestsResults($page = 0, $size = 20, $sort = self::SORT_ASC, RangeFilter $rangeFilter = null)
     {
         $this->requireAuth();
         $params = [
             'page' => $page,
             'size' => $size,
-            'order' => $order
+            'order' => $sort
         ];
         if ($rangeFilter) {
             $params['from'] = $rangeFilter->getFrom()->format("Y-m-d\TH:i:s\.00\Z");
@@ -137,17 +141,17 @@ class Api
     /**
      * @param $page
      * @param $size
-     * @param $order
+     * @param $sort
      * @param RangeFilter|null $rangeFilter
      * @return LiveNumberTestsResults
      */
-    public function getLiveNumberTestsResults($page = 0, $size = 20, $order = 'asc', RangeFilter $rangeFilter = null)
+    public function getLiveNumberTestsResults($page = 0, $size = 20, $sort = self::SORT_ASC, RangeFilter $rangeFilter = null)
     {
         $this->requireAuth();
         $params = [
             'page' => $page,
             'size' => $size,
-            'order' => $order
+            'order' => $sort
         ];
         if ($rangeFilter) {
             $params['from'] = $rangeFilter->getFrom()->format("Y-m-d\TH:i:s\.00\Z");
@@ -195,16 +199,16 @@ class Api
     /**
      * @param $page
      * @param $size
-     * @param $order
+     * @param $sort
      * @return SearchSessionPage
      */
-    public function getSessions($page = 0, $size = 20, $order = 'asc')
+    public function getSessions($page = 0, $size = 20, $sort = self::SORT_ASC)
     {
         $this->requireAuth();
         $params = [
             'page' => $page,
             'size' => $size,
-            'sort' => 'id,' . $order
+            'sort' => 'id,' . $sort
         ];
         return SearchSessionPage::fromArray(
             $this->request('GET', Url::create('/v3/client/sessions', $params))->getParsedBody()
@@ -268,16 +272,16 @@ class Api
     /**
      * @param $page
      * @param $size
-     * @param $order
+     * @param $sort
      * @return SearchSupplierPage
      */
-    public function getSuppliers($page = 0, $size = 20, $order = 'asc')
+    public function getSuppliers($page = 0, $size = 20, $sort = self::SORT_ASC)
     {
         $this->requireAuth();
         $params = [
             'page' => $page,
             'size' => $size,
-            'sort' => 'id,' . $order
+            'sort' => 'id,' . $sort
         ];
         return SearchSupplierPage::fromArray(
             $this->request('GET', Url::create('/v3/client/suppliers', $params))->getParsedBody()
@@ -307,16 +311,16 @@ class Api
     /**
      * @param $page
      * @param $size
-     * @param $order
+     * @param $sort
      * @return SessionSupplierPage
      */
-    public function getSessionsSuppliers($page = 0, $size = 20, $order = 'asc')
+    public function getSessionsSuppliers($page = 0, $size = 20, $sort = self::SORT_ASC)
     {
         $this->requireAuth();
         $params = [
             'page' => $page,
             'size' => $size,
-            'sort' => 'id,' . $order
+            'sort' => 'id,' . $sort
         ];
         return SessionSupplierPage::fromArray(
             $this->request('GET', Url::create('/v3/client/sessions-suppliers', $params))->getParsedBody()
