@@ -20,7 +20,7 @@ class LiveNumberTests implements ModelInterface
     /** @var string|null */
     private $sourceNpi;
     /** @var int */
-    private $testTimeToLiveInSeconds = 600;
+    private $testTimeToLiveInSeconds = 3600;
     /** @var int|null */
     private $smppValidityPeriod;
     /** @var \DateTime|null */

@@ -71,7 +71,7 @@ class ApiTest extends TestCase
         ]);
         $api = new Api(123, 'key', $httpClient);
 
-        $testsResponse = $api->sendTests(Tests::fromArray([
+        $testsResponse = $api->sendManualTests(Tests::fromArray([
             'destinationNetworks' => [new Destination('208', '10', '20')]
         ]));
 
@@ -118,7 +118,7 @@ class ApiTest extends TestCase
         ]);
         $api = new Api(123, 'key', $httpClient);
 
-        $resultResponse = $api->getTestResult(23);
+        $resultResponse = $api->getManualTestResult(23);
 
         $this->assertEquals($result['id'], $resultResponse->getId());
         $this->assertEquals($result['testIdText'], $resultResponse->getTestIdText());

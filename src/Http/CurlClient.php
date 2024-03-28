@@ -2,12 +2,16 @@
 
 namespace TelQ\Sdk\Http;
 
+use SebastianBergmann\CodeCoverage\Report\PHP;
+
 class CurlClient implements ClientInterface
 {
     private $curlOptions = [
         CURLOPT_FOLLOWLOCATION => true,
         CURLOPT_RETURNTRANSFER => true
     ];
+
+    private $debug = false;
 
     public function __construct(array $curlOptions = [])
     {
@@ -62,10 +66,42 @@ class CurlClient implements ClientInterface
             return $len;
         });
 
-        $body = curl_exec($ch);
-        $status = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        if ($this->debug) {
+            echo 'Request: ', $method, ' ', $url, PHP_EOL;
+            if (isset($sentHeaders)) {
+                echo 'Headers: ', PHP_EOL;
+                foreach ($sentHeaders as $header) {
+                    echo $header, PHP_EOL;
+                }
+            }
+           if ($body) {
+               echo 'Body: ', $body, PHP_EOL;
+           }
+        }
 
+        $body = curl_exec($ch);
+
+        if (($curlError = curl_errno($ch))) {
+            $curlErrorText = curl_error($ch);
+            curl_close($ch);
+            throw new ClientException('CURL error ' . $curlError . ': ' . $curlErrorText);
+        }
+
+        $status = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        if ($this->debug) {
+            echo 'Response ', $status, PHP_EOL;
+            echo 'Headers: ', PHP_EOL;
+            foreach ($headersResponse as $headerName => $headerValues) {
+                echo $headerName, ': ', implode(', ', $headerValues), PHP_EOL;
+            }
+            echo 'Body: ', $body, PHP_EOL, PHP_EOL;
+        }
         return new Response($status, $headersResponse, $body ? (string) $body : '');
     }
 
+    public function setDebug(bool $debug)
+    {
+        $this->debug = $debug;
+    }
 }

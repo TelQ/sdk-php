@@ -50,7 +50,7 @@ $sendTests = Tests::fromArray([
         new Destination('505', '01')
     ]
 ]);
-$tests = $api->sendTests($sendTests);
+$tests = $api->sendManualTests($sendTests);
 foreach ($tests as $test) {
     echo 'Id: ', $test->getId(), PHP_EOL;
     echo 'PhoneNumber: ', $test->getPhoneNumber(), PHP_EOL;
@@ -80,7 +80,7 @@ $sendTests = Tests::fromArray([
 ```
 ### Get test result
 ```php
-$result = $api->getTestResult(13777294);
+$result = $api->getManualTestResult(13777294);
 echo 'Id: ', $result->getId(), PHP_EOL;
 echo 'TestIdText: ', $result->getTestIdText(), PHP_EOL;
 echo 'Sender delivered: ', $result->getSenderDelivered() ?: 'empty', PHP_EOL;
@@ -240,6 +240,209 @@ foreach ($results->getContent() as $result) {
     echo 'DLR status: ', $result->getDlrStatus(), PHP_EOL;
     echo 'Receipt status: ', $result->getReceiptStatus(), PHP_EOL, PHP_EOL;
 }
+```
+# Sessions
+## Create session
+```php
+$session = $api->createSession(CreateUpdateSession::fromArray([
+    'hostIp' => '127.0.0.1',
+    'hostPort' => 9998,
+    'systemId' => 'login',
+    'password' => 'password',
+    'systemType' => null,
+    'throughput' => 5,
+    'destinationTon' => 1,
+    'destinationNpi' => 1,
+    'enabled' => false,
+    'windowSize' => 1,
+    'useSSL' => false,
+    'windowWaitTimeout' => 60000
+]));
+echo 'ID: ', $session->getSmppSessionId(), PHP_EOL;
+echo 'Host: ', $session->getHostIp(), ':', $session->getHostPort(), PHP_EOL;
+echo 'System ID: ', $session->getSystemId(), PHP_EOL;
+echo 'System type: ', $session->getSystemType(), PHP_EOL;
+echo 'Enabled: ', $session->getEnabled() ? 'ON' : 'OFF', PHP_EOL;
+```
+## Update session
+```php
+$api->updateSession(CreateUpdateSession::fromArray([
+    'smppSessionId' => 20603,
+    'hostIp' => '127.0.0.1',
+    'hostPort' => 9997,
+    'systemId' => 'login',
+    'password' => 'password',
+    'systemType' => null,
+    'throughput' => 5,
+    'destinationTon' => 1,
+    'destinationNpi' => 1,
+    'enabled' => false,
+    'windowSize' => 1,
+    'useSSL' => false,
+    'windowWaitTimeout' => 60000
+]));
+```
+## Get session
+```php
+$session = $api->getSession(20603);
+echo 'ID: ', $session->getSmppSessionId(), PHP_EOL;
+echo 'Host: ', $session->getHostIp(), ':', $session->getHostPort(), PHP_EOL;
+echo 'System ID: ', $session->getSystemId(), PHP_EOL;
+echo 'System type: ', $session->getSystemType(), PHP_EOL;
+echo 'Enabled: ', $session->getEnabled() ? 'ON' : 'OFF', PHP_EOL;
+echo 'Throughput: ', $session->getThroughput(), PHP_EOL;
+echo 'Destination TON: ', $session->getDestinationTon(), PHP_EOL;
+echo 'Destination NPI: ', $session->getDestinationNpi(), PHP_EOL;
+echo 'Window size: ', $session->getWindowSize(), PHP_EOL;
+echo 'Window wait timeout: ', $session->getWindowWaitTimeout(), PHP_EOL;
+echo 'SSL: ', $session->getUseSSL() ? 'YES' : 'NO', PHP_EOL;
+echo 'User: ', $session->getUserId(), ' ', $session->getUserName(), PHP_EOL;
+echo 'Online: ', $session->getOnline() ? 'YES' : 'NO', PHP_EOL;
+echo 'Suppliers: ', $session->getSupplierCount(), PHP_EOL;
+```
+## Get sessions
+```php
+// first page, 20 items per page, sort - desc by id
+$sessions = $api->getSessions(0, 20, 'desc');
+echo 'Total count: ', $sessions->getTotalElements(), PHP_EOL;
+echo 'Total pages: ', $sessions->getTotalPages(), PHP_EOL, PHP_EOL;
+foreach ($sessions->getContent() as $session) {
+    echo 'ID: ', $session->getSmppSessionId(), PHP_EOL;
+    echo 'Host: ', $session->getHostIp(), ':', $session->getHostPort(), PHP_EOL;
+    echo 'System ID: ', $session->getSystemId(), PHP_EOL;
+    echo 'System type: ', $session->getSystemType(), PHP_EOL;
+    echo 'Enabled: ', $session->getEnabled() ? 'ON' : 'OFF', PHP_EOL;
+    echo 'Throughput: ', $session->getThroughput(), PHP_EOL;
+    echo 'Destination TON: ', $session->getDestinationTon(), PHP_EOL;
+    echo 'Destination NPI: ', $session->getDestinationNpi(), PHP_EOL;
+    echo 'Window size: ', $session->getWindowSize(), PHP_EOL;
+    echo 'Window wait timeout: ', $session->getWindowWaitTimeout(), PHP_EOL;
+    echo 'SSL: ', $session->getUseSSL() ? 'YES' : 'NO', PHP_EOL;
+    echo 'User: ', $session->getUserId(), ' ', $session->getUserName(), PHP_EOL;
+    echo 'Online: ', $session->getOnline() ? 'YES' : 'NO', PHP_EOL;
+    echo 'Suppliers: ', $session->getSupplierCount(), PHP_EOL, PHP_EOL;
+}
+```
+## Delete session
+```php
+$api->deleteSession(20603);
+```
+# Suppliers
+## Create supplier
+```php
+$supplier = $api->createSupplier(CreateUpdateSupplier::fromArray([
+    'supplierName' => 'TestSupplier',
+    'routeType' => 'direct',
+    'attributeList' => ['TWO_WAY', 'P2P'],
+    'comment' => null,
+    'serviceType' => null,
+    'tlv' => [
+        new UdhTlv('1B1A', '1AAF')
+    ],
+    'udh' => [
+        new UdhTlv('1F', '11BB')
+    ],
+    'smppSessionId' => 20602
+]));
+echo 'Supplier ID: ', $supplier->getSupplierId(), PHP_EOL;
+echo 'Session ID: ', $supplier->getSmppSessionId(), PHP_EOL;
+echo 'Name: ', $supplier->getSupplierName(), PHP_EOL;
+echo 'Route type: ', $supplier->getRouteType(), PHP_EOL;
+echo 'Attributes: ', implode(', ', $supplier->getAttributeList()), PHP_EOL;
+echo 'Service type: ', $supplier->getServiceType(), PHP_EOL;
+echo 'Comment: ', $supplier->getComment(), PHP_EOL;
+```
+## Update supplier
+```php
+$api->updateSupplier(CreateUpdateSupplier::fromArray([
+    'supplierId' => 73115,
+    'supplierName' => 'TestSupplier',
+    'routeType' => 'direct',
+    'attributeList' => ['TWO_WAY', 'P2P'],
+    'comment' => 'My comment',
+    'serviceType' => null,
+    'tlv' => [
+        new UdhTlv('1B1A', '1AAF')
+    ],
+    'udh' => [
+        new UdhTlv('1F', '11BB')
+    ],
+    'smppSessionId' => 20602
+]));
+```
+## Get supplier
+```php
+$supplier = $api->getSupplier(73115);
+echo 'Supplier ID: ', $supplier->getSupplierId(), PHP_EOL;
+echo 'Session ID: ', $supplier->getSmppSessionId(), PHP_EOL;
+echo 'Name: ', $supplier->getSupplierName(), PHP_EOL;
+echo 'Route type: ', $supplier->getRouteType(), PHP_EOL;
+echo 'Attributes: ', implode(', ', $supplier->getAttributeList()), PHP_EOL;
+echo 'Service type: ', $supplier->getServiceType(), PHP_EOL;
+echo 'UDH: ', count($supplier->getUdh()), PHP_EOL;
+echo 'TLV: ', count($supplier->getTlv()), PHP_EOL;
+echo 'Comment: ', $supplier->getComment(), PHP_EOL;
+echo 'User: ', $supplier->getUserId(), PHP_EOL;
+```
+## Get suppliers
+```php
+// first page, 20 items per page, sort - desc by id
+$suppliers = $api->getSuppliers(0, 20, 'desc');
+echo 'Total count: ', $suppliers->getTotalElements(), PHP_EOL;
+echo 'Total pages: ', $suppliers->getTotalPages(), PHP_EOL, PHP_EOL;
+foreach ($suppliers->getContent() as $supplier) {
+    echo 'Supplier ID: ', $supplier->getSupplierId(), PHP_EOL;
+    echo 'Session ID: ', $supplier->getSmppSessionId(), PHP_EOL;
+    echo 'Name: ', $supplier->getSupplierName(), PHP_EOL;
+    echo 'Route type: ', $supplier->getRouteType(), PHP_EOL;
+    echo 'Attributes: ', implode(', ', $supplier->getAttributeList()), PHP_EOL;
+    echo 'Service type: ', $supplier->getServiceType(), PHP_EOL;
+    echo 'UDH: ', count($supplier->getUdh()), PHP_EOL;
+    echo 'TLV: ', count($supplier->getTlv()), PHP_EOL;
+    echo 'Comment: ', $supplier->getComment(), PHP_EOL;
+    echo 'User: ', $supplier->getUserId(), PHP_EOL, PHP_EOL;
+}
+```
+## Get suppliers by session
+```php
+$suppliers = $api->getSuppliersBySessionId(20602);
+foreach ($suppliers as $supplier) {
+    echo 'Supplier ID: ', $supplier->getSupplierId(), PHP_EOL;
+    echo 'Session ID: ', $supplier->getSmppSessionId(), PHP_EOL;
+    echo 'Name: ', $supplier->getSupplierName(), PHP_EOL;
+    echo 'Route type: ', $supplier->getRouteType(), PHP_EOL;
+    echo 'Attributes: ', implode(', ', $supplier->getAttributeList()), PHP_EOL;
+    echo 'Service type: ', $supplier->getServiceType(), PHP_EOL;
+    echo 'UDH: ', count($supplier->getUdh()), PHP_EOL;
+    echo 'TLV: ', count($supplier->getTlv()), PHP_EOL;
+    echo 'Comment: ', $supplier->getComment(), PHP_EOL;
+    echo 'User: ', $supplier->getUserId(), PHP_EOL, PHP_EOL;
+}
+```
+## Delete supplier
+```php
+$api->deleteSupplier(73115);
+```
+## Get session to supplier pairs
+```php
+// first page, 20 items per page, sort - desc by id
+$pairs = $api->getSessionsSuppliers(0, 20, 'desc');
+echo 'Total count: ', $pairs->getTotalElements(), PHP_EOL;
+echo 'Total pages: ', $pairs->getTotalPages(), PHP_EOL, PHP_EOL;
+foreach ($pairs->getContent() as $pair) {
+    echo 'Supplier ID: ', $pair->getSupplierId(), PHP_EOL;
+    echo 'Session ID: ', $pair->getSmppSessionId(), PHP_EOL;
+    echo 'Name: ', $pair->getSupplierName(), PHP_EOL;
+    echo 'Route type: ', $pair->getRouteType(), PHP_EOL;
+    echo 'Attributes: ', implode(', ', $pair->getAttributes()), PHP_EOL;
+    echo 'Online: ', $pair->getOnline() ? 'YES' : 'NO', PHP_EOL, PHP_EOL;
+}
+```
+## Assign suppliers to session
+```php
+$supplierIds = [73115, 73113];
+$sessionId = 20602;
+$api->assignSuppliersToSession($supplierIds, $sessionId);
 ```
 # Configuration
 ## Http client
