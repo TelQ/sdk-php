@@ -16,7 +16,7 @@ class SessionSupplierPage extends BaseModel
     private $totalPages;
 
     /**
-     * @return SearchSupplier[]
+     * @return SessionSupplier[]
      */
     public function getContent(): array
     {
