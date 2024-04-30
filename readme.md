@@ -209,6 +209,14 @@ $sendTests = LiveNumberTests::fromArray([
     ], 
 ]);
 ```
+### Get test result
+```php
+$result = $api->getLiveTestResult(1155470);
+echo 'Id: ', $result->getId(), PHP_EOL;
+echo 'TestIdText: ', $result->getTestIdText(), PHP_EOL;
+echo 'DLR status: ', $result->getDlrStatus(), PHP_EOL;
+echo 'Receipt status: ', $result->getReceiptStatus(), PHP_EOL;
+```
 ### Search tests results
 ```php
 // last 20 results
