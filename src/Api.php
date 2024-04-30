@@ -8,6 +8,7 @@ use TelQ\Sdk\Http\HttpException;
 use TelQ\Sdk\Http\Response;
 use TelQ\Sdk\Http\Url;
 use TelQ\Sdk\Models\Credentials;
+use TelQ\Sdk\Models\Lnt\LiveNumberTestResult;
 use TelQ\Sdk\Models\Lnt\LiveNumberTests;
 use TelQ\Sdk\Models\Lnt\LiveNumberTestsResponse;
 use TelQ\Sdk\Models\Lnt\LiveNumberTestsResults;
@@ -136,6 +137,19 @@ class Api
         $this->requireAuth();
 
         return LiveNumberTestsResponse::fromArray($this->request('POST', '/v3/client/lnt/tests', $tests)->getParsedBody());
+    }
+
+    /**
+     * @param int $id
+     * @return LiveNumberTestResult
+     */
+    public function getLiveTestResult($id)
+    {
+        $this->requireAuth();
+
+        return LiveNumberTestResult::fromArray(
+            $this->request('GET', '/v3/client/lnt/tests/' . $id)->getParsedBody()
+        );
     }
 
     /**
