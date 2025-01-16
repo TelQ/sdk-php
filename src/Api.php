@@ -32,13 +32,14 @@ use TelQ\Sdk\Models\TestsResults;
 use TelQ\Sdk\Models\Token;
 use TelQ\Sdk\Token\MemoryStorage;
 use TelQ\Sdk\Token\TokenStorageInterface;
+use Composer\InstalledVersions;
 
 class Api
 {
     const BASE_URL = 'https://api.telqtele.com';
-    
+
     const SORT_ASC = 'asc';
-    
+
     const SORD_DESC = 'desc';
 
     private $httpClient;
@@ -365,9 +366,11 @@ class Api
     private function request($method, $url, ModelInterface $body = null)
     {
         $url = self::BASE_URL . '/' . ltrim($url, '/');
+
+        $version = InstalledVersions::getVersion("telq/sdk");
         $headers = [
             'accept' => 'application/json',
-            'user-agent' => 'php-sdk-2.0.0'
+            'user-agent' => 'php-sdk/' . $version
         ];
 
         if ($this->token and $this->token->getValue()) {
