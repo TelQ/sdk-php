@@ -5,8 +5,8 @@ use TelQ\Sdk\Http\HttpException;
 use TelQ\Sdk\Models\Destination;
 use TelQ\Sdk\Models\Tests;
 
-$appId = 2580;
-$appKey = '#UdH!Z#yWVrdroehK-TWtV3#_eGh2T-HZ59';
+$appId = 0;
+$appKey = '';
 
 $api = new Api($appId, $appKey);
 try {
