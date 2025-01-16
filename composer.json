@@ -6,7 +6,7 @@
   ],
   "homepage": "https://github.com/TelQ/sdk-php",
   "type": "library",
-  "version": "v2.0.2",
+  "version": "v2.0.3",
   "license": "MIT",
   "require": {
     "php": ">=7.3",
